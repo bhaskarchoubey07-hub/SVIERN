@@ -21,46 +21,51 @@ def get_connection():
     return psycopg2.connect(DB_URL)
 
 def init_db():
+    conn = None
     try:
         conn = get_connection()
         c = conn.cursor()
-    
-    # Use standard Postgres SQL
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        email TEXT
-    );
-    CREATE TABLE IF NOT EXISTS vehicles (
-        id SERIAL PRIMARY KEY,
-        owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        vehicle_number TEXT UNIQUE NOT NULL,
-        owner_name TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        emergency_contact TEXT,
-        medical_info TEXT
-    );
-    CREATE TABLE IF NOT EXISTS scans (
-        id SERIAL PRIMARY KEY,
-        vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE CASCADE,
-        scan_time TIMESTAMP DEFAULT NOW(),
-        latitude DOUBLE PRECISION,
-        longitude DOUBLE PRECISION,
-        location_name TEXT
-    );
-    CREATE TABLE IF NOT EXISTS alerts (
-        id SERIAL PRIMARY KEY,
-        vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE CASCADE,
-        alert_type TEXT NOT NULL,
-        alert_time TIMESTAMP DEFAULT NOW(),
-        message TEXT,
-        is_resolved BOOLEAN DEFAULT FALSE
-    );
-    """)
-    conn.commit()
-    conn.close()
+        
+        # Use standard Postgres SQL
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            email TEXT
+        );
+        CREATE TABLE IF NOT EXISTS vehicles (
+            id SERIAL PRIMARY KEY,
+            owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            vehicle_number TEXT UNIQUE NOT NULL,
+            owner_name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            emergency_contact TEXT,
+            medical_info TEXT
+        );
+        CREATE TABLE IF NOT EXISTS scans (
+            id SERIAL PRIMARY KEY,
+            vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE CASCADE,
+            scan_time TIMESTAMP DEFAULT NOW(),
+            latitude DOUBLE PRECISION,
+            longitude DOUBLE PRECISION,
+            location_name TEXT
+        );
+        CREATE TABLE IF NOT EXISTS alerts (
+            id SERIAL PRIMARY KEY,
+            vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE CASCADE,
+            alert_type TEXT NOT NULL,
+            alert_time TIMESTAMP DEFAULT NOW(),
+            message TEXT,
+            is_resolved BOOLEAN DEFAULT FALSE
+        );
+        """)
+        conn.commit()
+    except Exception as e:
+        print(f"Error initializing DB: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 # --- USER OPERATIONS ---
 def create_user(username, password, email):
