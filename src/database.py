@@ -5,20 +5,25 @@ from datetime import datetime
 import streamlit as st
 
 # Load database URL from secrets
-try:
-    DB_URL = st.secrets["database"]["url"]
-except Exception:
-    st.error("Database URL not found in secrets. Please check .streamlit/secrets.toml")
-    DB_URL = None
+def get_db_url():
+    try:
+        return st.secrets["database"]["url"]
+    except Exception:
+        return None
+
+DB_URL = get_db_url()
 
 def get_connection():
+    if not DB_URL:
+        st.error("🚫 **Database Connection Failed**: Database URL not found in secrets.")
+        st.info("💡 **Fix**: If you are on Streamlit Cloud, go to **Settings > Secrets** and paste your `.streamlit/secrets.toml` content there.")
+        st.stop()
     return psycopg2.connect(DB_URL)
 
 def init_db():
-    # Tables should be created via Neon SQL Editor, but we can attempt to create them here too
-    # for a "ready to deploy" experience.
-    conn = get_connection()
-    c = conn.cursor()
+    try:
+        conn = get_connection()
+        c = conn.cursor()
     
     # Use standard Postgres SQL
     c.execute("""
