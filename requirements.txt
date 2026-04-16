@@ -1,0 +1,9 @@
+streamlit
+pandas
+plotly
+qrcode
+pillow
+folium
+streamlit-folium
+bcrypt
+psycopg2-binary

@@ -1,0 +1,18 @@
+# Streamlit Secrets (DO NOT PUSH)
+.streamlit/secrets.toml
+
+# Local SQLite databases
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+
+# IDEs
+.vscode/
+.idea/
